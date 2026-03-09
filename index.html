@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIFIED COMMAND | 2026</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --accent-color: #22d3ee; /* Cyan neon */
+            --text-color: #e2e8f0;
+            --glow-color: rgba(34, 211, 238, 0.3);
+            --red-glow: rgba(239, 68, 68, 0.5);
+            --blue-glow: rgba(59, 130, 246, 0.5);
+            --border-style: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Roboto Mono', 'Courier New', monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: box-shadow 0.5s ease;
+        }
+
+        /* Dynamic Glow States */
+        body.glow-red {
+            box-shadow: inset 0 0 100px var(--red-glow);
+        }
+
+        body.glow-blue {
+            box-shadow: inset 0 0 100px var(--blue-glow);
+        }
+
+        header {
+            padding: 20px;
+            border-bottom: var(--border-style);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 10;
+        }
+
+        .system-status {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: var(--border-style);
+            padding: 24px;
+            border-radius: 4px;
+            backdrop-filter: blur(8px);
+            position: relative;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 20px;
+            height: 20px;
+            border-top: 2px solid var(--accent-color);
+            border-left: 2px solid var(--accent-color);
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(34, 211, 238, 0.2);
+            padding-bottom: 10px;
+        }
+
+        /* Chronos Engine Styling */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        input[type="date"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .result-display {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .result-label {
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        /* Tension Feed Styling */
+        .news-item {
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 2px solid #ef4444; /* Crisis Red */
+        }
+
+        .news-title {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
+            color: #f8fafc;
+        }
+
+        .news-meta {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+
+        /* Breaking News Ticker */
+        .ticker-container {
+            height: 40px;
+            background: #ef4444;
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .ticker-label {
+            background: #000;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 40s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        .ticker-text {
+            display: inline-block;
+            padding-right: 50px;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body id="body">
+    <header>
+        <div class="header-left">
+            <h1 style="font-size: 1.1rem; letter-spacing: 3px;">STRATCOM TERMINAL</h1>
+        </div>
+        <div class="system-status" id="system-clock">
+            INITIALIZING COMMAND PROTOCOLS...
+        </div>
+    </header>
+
+    <main>
+        <!-- Left: Chronos Engine -->
+        <section class="card">
+            <h2>The Chronos Engine</h2>
+            <div class="input-group">
+                <label for="dob">ENTER SUBJECT BIRTH DATE:</label>
+                <input type="date" id="dob">
+            </div>
+            <button onclick="calculateChronos()">CALCULATE TEMPORAL STATE</button>
+
+            <div id="chronos-result" class="result-display" style="display: none;">
+                <p><span class="result-label">AGE:</span> <span id="age-text">-</span></p>
+                <p><span class="result-label">NATAL DAY:</span> <span id="birth-day">-</span></p>
+                <p><span class="result-label">ASTRO-SIGN:</span> <span id="zodiac-sign">-</span></p>
+            </div>
+        </section>
+
+        <!-- Right: Tension Feed -->
+        <section class="card">
+            <h2>The 2026 Tension Feed</h2>
+            <div id="live-news">
+                <div class="news-item">
+                    <span class="news-title">Operation Epic Fury: U.S. and Israel resume strikes on Tehran following the death of Supreme Leader Khamenei.</span>
+                    <span class="news-meta">MAR 09, 2026 | 14:22 ZULU</span>
+                </div>
+                <div class="news-item" style="border-left-color: #f59e0b;">
+                    <span class="news-title">Global Oil Crisis: Strait of Hormuz remains officially closed; Brent crude surges past $110.</span>
+                    <span class="news-meta">MAR 09, 2026 | 13:45 ZULU</span>
+                </div>
+                <div class="news-item">
+                    <span class="news-title">Eastern Front: Russian forces gain 25sq miles near Donetsk; Ukraine shortages of Patriot interceptors reported.</span>
+                    <span class="news-meta">MAR 09, 2026 | 11:10 ZULU</span>
+                </div>
+                <div class="news-item">
+                    <span class="news-title">Middle East Crisis: Massive protests in Tehran as Mojtaba Khamenei is named successor.</span>
+                    <span class="news-meta">MAR 09, 2026 | 09:30 ZULU</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Breaking News Ticker -->
+    <div class="ticker-container">
+        <div class="ticker-label">BREAKING</div>
+        <div class="ticker-content" id="ticker-content">
+            <span class="ticker-text">OPERATION EPIC FURY: U.S. AND ISRAEL RESUME STRIKES ON TEHRAN...</span>
+            <span class="ticker-text">OIL PRICES SURGE PAST $110 AS HORMUZ REMAINS CLOSED...</span>
+            <span class="ticker-text">UKRAINE REPORTS CRITICAL SM-3 SHORTAGES ON DONETSK FRONT...</span>
+            <span class="ticker-text">MOJTABA KHAMENEI NAMES SELF SUPREME LEADER AMID PROTESTS...</span>
+            <span class="ticker-text">UN SECURITY COUNCIL EMERGENCY SESSION SCHEDULED FOR 21:00...</span>
+        </div>
+    </div>
+
+    <script>
+        // Set System Clock
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('system-clock').innerText = `${dateStr} // ${timeStr} ZULU`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function calculateChronos() {
+            const dobValue = document.getElementById('dob').value;
+            if (!dobValue) return;
+
+            const dob = new Date(dobValue);
+            const now = new Date();
+
+            // Age Calculation
+            let years = now.getFullYear() - dob.getFullYear();
+            let months = now.getMonth() - dob.getMonth();
+            let days = now.getDate() - dob.getDate();
+
+            if (days < 0) {
+                months--;
+                const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += lastMonth.getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            document.getElementById('age-text').innerText = `${years}y ${months}m ${days}d`;
+
+            // Day of Week
+            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            document.getElementById('birth-day').innerText = daysOfWeek[dob.getDay()];
+
+            // Zodiac Calculation
+            const sign = getZodiac(dob.getMonth() + 1, dob.getDate());
+            document.getElementById('zodiac-sign').innerText = sign;
+
+            // Apply Glow
+            const body = document.getElementById('body');
+            body.classList.remove('glow-red', 'glow-blue');
+
+            if (sign === "Scorpio" || sign === "Aries") {
+                body.classList.add('glow-red');
+            } else if (sign === "Pisces" || sign === "Cancer") {
+                body.classList.add('glow-blue');
+            }
+
+            document.getElementById('chronos-result').style.display = 'block';
+        }
+
+        function getZodiac(month, day) {
+            const signs = [
+                { name: "Capricorn", start: [12, 22], end: [1, 19] },
+                { name: "Aquarius", start: [1, 20], end: [2, 18] },
+                { name: "Pisces", start: [2, 19], end: [3, 20] },
+                { name: "Aries", start: [3, 21], end: [4, 19] },
+                { name: "Taurus", start: [4, 20], end: [5, 20] },
+                { name: "Gemini", start: [5, 21], end: [6, 20] },
+                { name: "Cancer", start: [6, 21], end: [7, 22] },
+                { name: "Leo", start: [7, 23], end: [8, 22] },
+                { name: "Virgo", start: [8, 23], end: [9, 22] },
+                { name: "Libra", start: [9, 23], end: [10, 22] },
+                { name: "Scorpio", start: [10, 23], end: [11, 21] },
+                { name: "Sagittarius", start: [11, 22], end: [12, 21] }
+            ];
+
+            const match = signs.find(s => {
+                if (s.name === "Capricorn") {
+                    return (month === 12 && day >= 22) || (month === 1 && day <= 19);
+                }
+                return (month === s.start[0] && day >= s.start[1]) || (month === s.end[0] && day <= s.end[1]);
+            });
+
+            return match ? match.name : "Unknown";
+        }
+    </script>
+</body>
+</html>
